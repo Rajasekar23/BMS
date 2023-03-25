@@ -158,6 +158,19 @@ class ClassBookingRepositoryEloquent extends BaseRepository implements ClassBook
             $response = ['message' => 'Booking Not Found for id : '.$bookingId];
             throw ValidationException::withMessages($response);
         }
+
+        $date = Carbon::parse($classBooking->booked_at);
+        $now = Carbon::now();
+
+        $diff = $date->diffInHours($now);
+        if($diff < 24){
+            if(!$classBooking){
+                $response = ['message' => 'Your class cannot be canceled less than 24 hours in advance.  : '.$bookingId];
+                throw ValidationException::withMessages($response);
+            }
+        }
+
+
         $classBooking->status = 'CANCELED';
         $classBooking->save();
 
